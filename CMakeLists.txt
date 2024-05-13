@@ -23,6 +23,11 @@ option(
 	"Ethereum 2.0 spec"
 	"OFF"
 )
+option(
+    BUILD_SHARED_LIBS
+    "Build shared library"
+    ON
+)
 
 if(BLS_ETH)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBLS_ETH")
@@ -49,7 +54,7 @@ endif()
 add_subdirectory(mcl)
 
 foreach(bit IN ITEMS 256 384 384_256)
-	add_library(bls${bit} SHARED src/bls_c${bit}.cpp)
+	add_library(bls${bit} src/bls_c${bit}.cpp)
 	add_library(bls::bls${bit} ALIAS bls${bit})
 	target_compile_definitions(bls${bit} PRIVATE BLS_NO_AUTOLINK)
 	target_include_directories(bls${bit} PUBLIC
