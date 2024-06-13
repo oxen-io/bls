@@ -10,6 +10,8 @@
 #define MCLBN_NO_AUTOLINK
 #endif
 #include <mcl/bn.h>
+#include <functional>
+#include <string>
 
 #ifdef BLS_ETH
 	#define BLS_COMPILER_TIME_VAR_ADJ 200
@@ -250,6 +252,8 @@ BLS_DLL_API int blsVerifyPairing(const blsSignature *X, const blsSignature *Y, c
 	NOTE : return false if h is zero or c1 or -c1 value for BN254. see hashTest() in test/bls_test.hpp
 */
 BLS_DLL_API int blsSignHash(blsSignature *sig, const blsSecretKey *sec, const void *h, mclSize size);
+using HashFunction = std::function<std::array<unsigned char,32>(const std::string&)>;
+BLS_DLL_API int blsSignHashFunc(blsSignature *sig, const blsSecretKey *sec, const std::string& message, HashFunction hashFunc);
 // return 1 if valid
 BLS_DLL_API int blsVerifyHash(const blsSignature *sig, const blsPublicKey *pub, const void *h, mclSize size);
 

@@ -13,6 +13,7 @@
 #include <iosfwd>
 #include <stdint.h>
 #include <memory.h>
+#include <functional>
 
 namespace bls {
 
@@ -262,6 +263,8 @@ public:
 	}
 	// sign hashed value
 	void signHash(Signature& sig, const void *h, size_t size) const;
+    using HashFunction = std::function<std::array<unsigned char,32>(const std::string&)>;
+	void signHashFunc(Signature& sig, const std::string& message, HashFunction hashFunc) const;
 	void signHash(Signature& sig, const std::string& h) const
 	{
 		signHash(sig, h.c_str(), h.size());
@@ -577,6 +580,10 @@ inline void SecretKey::sign(Signature& sig, const void *m, size_t size) const
 inline void SecretKey::signHash(Signature& sig, const void *h, size_t size) const
 {
 	if (blsSignHash(&sig.self_, &self_, h, size) != 0) throw std::runtime_error("bad h");
+}
+inline void SecretKey::signHashFunc(Signature& sig, const std::string& message, HashFunction hashFunc) const
+{
+	if (blsSignHashFunc(&sig.self_, &self_, message, hashFunc) != 0) throw std::runtime_error("bad h");
 }
 inline void SecretKey::getPop(Signature& pop) const
 {

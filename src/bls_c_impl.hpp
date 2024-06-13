@@ -646,6 +646,7 @@ int blsPublicKeyIsValidOrder(const blsPublicKey *pub)
 	return cast(&pub->v)->isValidOrder();
 }
 
+//TODO sean first it goes here and does its thing
 #ifndef BLS_MINIMUM_API
 template<class G>
 inline bool toG(G& Hm, const void *h, mclSize size)
@@ -664,6 +665,15 @@ inline bool toG(G& Hm, const void *h, mclSize size)
 	BN::mapToG1(&b, Hm, t);
 #endif
 	return b;
+}
+
+//TODO sean this was also changed
+template<class G>
+bool toG(G& Hm, const std::string& message, HashFunction hashFunc)
+{
+    bool b;
+    BN::mapToG2Hash(&b, Hm, message, hashFunc);
+    return b;
 }
 
 int blsVerifyAggregatedHashes(const blsSignature *aggSig, const blsPublicKey *pubVec, const void *hVec, size_t sizeofHash, mclSize n)
@@ -718,6 +728,7 @@ int blsVerifyAggregatedHashes(const blsSignature *aggSig, const blsPublicKey *pu
 	return e.isOne();
 }
 
+// TODO sean this is called by our code
 int blsSignHash(blsSignature *sig, const blsSecretKey *sec, const void *h, mclSize size)
 {
 	G Hm;
@@ -725,6 +736,15 @@ int blsSignHash(blsSignature *sig, const blsSecretKey *sec, const void *h, mclSi
 	Fr s = *cast(&sec->v);
 	GmulCT(*cast(&sig->v), Hm, s);
 	return 0;
+}
+
+int blsSignHashFunc(blsSignature *sig, const blsSecretKey *sec, const std::string& message, HashFunction hashFunc)
+{
+    G Hm;
+    if (!toG(Hm, message, hashFunc)) return -1;
+    Fr s = *cast(&sec->v);
+    GmulCT(*cast(&sig->v), Hm, s);
+    return 0;
 }
 
 #ifdef BLS_ETH
